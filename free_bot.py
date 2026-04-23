@@ -123,8 +123,8 @@ def welcome_text():
 
 def dashboard_text(user, runtime_used):
     phone = user[1] if user and user[1] else "Not connected"
-    msg_status = "✅ Set" if user and user[5] else "❌ Not set"
-    campaign = "🟢 Live" if user and user[6] else "🔴 Stopped"
+    msg_status = "✅ Set" if user and user[3] else "❌ Not set"   # user[3]=promo_message
+    campaign = "🟢 Live" if user and user[4] else "🔴 Stopped"   # user[4]=is_active
     hours_used = runtime_used / 3600
     hours_left = max(0, 8 - hours_used)
     return (
@@ -226,7 +226,7 @@ class Database:
     def save_session(self, user_id, phone, session_string):
         conn = self.get_conn()
         c = conn.cursor()
-        c.execute('''UPDATE free_users SET phone=%s, session_string=%s
+        c.execute('''UPDATE free_users SET phone=%s, session_string=%s, is_active=0
                      WHERE user_id=%s''',
                   (phone, session_string, user_id))
         conn.commit()
