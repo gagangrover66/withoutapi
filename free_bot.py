@@ -526,12 +526,21 @@ class UzeronFreeBot:
         async def callbacks(event):
             uid = event.sender_id
             data = event.data.decode('utf-8')
-            await event.answer()
             mid = event.query.msg_id
+
+            # ── OTP NUMPAD: handle otp_0..9, otp_del, otp_submit
+            # handle_otp_button manages its own event.answer() calls
+            if data.startswith('otp_'):
+                parts = data.split('_')
+                action = parts[1]  # e.g. '5', 'del', 'submit'
+                await self.handle_otp_button(event, uid, action)
+                return
 
             if self.db.is_banned(uid):
                 await event.answer("🚫 You are banned!", alert=True)
                 return
+
+            await event.answer()
 
             user = self.db.get_user(uid)
             runtime = self.db.get_runtime_today(uid) if user else 0
